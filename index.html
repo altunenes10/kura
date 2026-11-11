@@ -48,6 +48,10 @@ li .pt{font:800 22px "Barlow Condensed",sans-serif;min-width:34px;text-align:rig
 .empty{color:var(--mu);padding:30px 6px;text-align:center}
 .win{flex:1;color:#fff}
 .win.t{background:#9a6412}.win.ct{background:#245d99}
+.g{padding:6px 12px;margin:0 6px 6px 0}
+.g.on{background:var(--ac);color:var(--ac-tx);border-color:var(--ac)}
+.detail{border:1px solid var(--ln);border-radius:4px;padding:6px 12px;margin-top:6px;background:var(--bg)}
+.dl{margin:6px 0}.dl.t b{color:var(--t)}.dl.ct b{color:var(--ct)}
 .payers{margin:12px 0 0;font:600 22px/1.4 Barlow,sans-serif}
 .payers b{color:var(--bad);font-weight:800}
 </style>
@@ -64,6 +68,9 @@ li .pt{font:800 22px "Barlow Condensed",sans-serif;min-width:34px;text-align:rig
       <button id="addBtn">Ekle</button>
     </div>
     <ul id="list"></ul>
+    <h2 style="margin-top:22px">Oynanan maçlar</h2>
+    <div id="games"></div>
+    <div id="detail"></div>
     <div class="actions"><button class="ghost" id="clear">Listeyi temizle</button></div>
   </section>
   <section class="card">
@@ -91,7 +98,7 @@ li .pt{font:800 22px "Barlow Condensed",sans-serif;min-width:34px;text-align:rig
 </main>
 <script>
 (function(){
-var players=[],rounds=[],last='',timers=[],cur=null,done=true,rt=null;
+var players=[],rounds=[],last='',timers=[],cur=null,done=true,rt=null,sel=-1;
 var $=function(i){return document.getElementById(i)};
 try{var s=JSON.parse(localStorage.getItem('cs-players2')||'[]');if(Array.isArray(s))players=s.filter(function(p){return p&&typeof p.n==='string'}).slice(0,20).map(function(p){return{n:p.n}});
 var r=JSON.parse(localStorage.getItem('cs-rounds')||'[]');if(Array.isArray(r))rounds=r.filter(function(x){return x&&Array.isArray(x.w)})}catch(e){}
@@ -107,6 +114,16 @@ function render(){
     return '<li><span class="n">'+esc(o.n)+'</span><span class="pt" title="Puan">'+o.p+'</span><button class="x" data-r="'+o.i+'" aria-label="'+esc(o.n)+' sil">×</button></li>';
   }).join('');
   $('undo').disabled=!rounds.length;
+  renderGames();
+}
+function renderGames(){
+  var g=$('games'),d=$('detail');
+  if(!rounds.length){g.innerHTML='<p class="hint">Henüz oynanan maç yok.</p>';d.innerHTML='';return}
+  g.innerHTML=rounds.map(function(r,i){return '<button class="ghost g'+(i===sel?' on':'')+'" data-g="'+i+'" aria-pressed="'+(i===sel)+'">'+(r.n||i+1)+'. Oyun</button>'}).join('');
+  var r=rounds[sel];
+  if(!r){d.innerHTML='';return}
+  function line(l,c,arr,w){return '<p class="dl '+c+'"><b>'+l+(w?' (kazandı)':'')+'</b>: '+arr.map(esc).join(', ')+'</p>'}
+  d.innerHTML='<div class="detail">'+(Array.isArray(r.T)&&Array.isArray(r.CT)?line('Terörist','t',r.T,r.s==='T')+line('Anti-Terör','ct',r.CT,r.s==='CT'):line('Kazanan kadro',r.s==='CT'?'ct':'t',r.w,false))+'</div>';
 }
 function add(){
   var v=$('name').value.trim();if(!v)return;
@@ -117,16 +134,41 @@ function add(){
 $('addBtn').onclick=add;
 $('name').onkeydown=function(e){if(e.key==='Enter')add()};
 $('list').onclick=function(e){var r=e.target.getAttribute('data-r');if(r!==null){players.splice(+r,1);save();render()}};
-$('clear').onclick=function(){players=[];rounds=[];last='';cur=null;save();render();$('res').hidden=true;$('billOut').innerHTML='';$('out').innerHTML='<p class="empty">En az 2 oyuncu ekle, sonra kurayı çek.</p>';$('info').textContent=''};
+$('clear').onclick=function(){players=[];rounds=[];sel=-1;last='';cur=null;save();render();$('res').hidden=true;$('billOut').innerHTML='';$('out').innerHTML='<p class="empty">En az 2 oyuncu ekle, sonra kurayı çek.</p>';$('info').textContent=''};
 function key(a,b){var f=function(x){return x.slice().sort().join('|')};var A=f(a),B=f(b);return A<B?A+'//'+B:B+'//'+A}
+function tk(a){return a.slice().sort().join('|')}
+function hist(){return rounds.filter(function(r){return Array.isArray(r.T)&&Array.isArray(r.CT)})}
+function side(r,p){return r.T.indexOf(p)>-1?'T':r.CT.indexOf(p)>-1?'CT':''}
+function viol(T,CT,H){
+  var v=0,n=H.length;
+  if(n>=2){
+    var h1=H[n-1],h2=H[n-2];
+    T.forEach(function(p){if(side(h1,p)==='T'&&side(h2,p)==='T')v++});
+    CT.forEach(function(p){if(side(h1,p)==='CT'&&side(h2,p)==='CT')v++});
+    [h1.T,h1.CT].forEach(function(A){[h2.T,h2.CT].forEach(function(B){
+      var c=A.filter(function(p){return B.indexOf(p)>-1});
+      if(c.length>=3)[T,CT].forEach(function(tm){if(tm.filter(function(p){return c.indexOf(p)>-1}).length>=3)v++});
+    })});
+  }
+  var ks=[];H.slice(-3).forEach(function(r){ks.push(tk(r.T),tk(r.CT))});
+  if(ks.indexOf(tk(T))>-1)v++;
+  if(ks.indexOf(tk(CT))>-1)v++;
+  return v;
+}
 function draw(){
   if(players.length<2){$('info').textContent='Kura için en az 2 oyuncu gerekli.';return}
-  var half=Math.floor(players.length/2),names=players.map(function(p){return p.n}),a,b,t=0;
-  do{var sh=shuffle(names);a=sh.slice(0,half);b=sh.slice(half);t++}while(key(a,b)===last&&t<50);
-  last=key(a,b);
-  var tA=Math.random()<.5;
-  cur={T:tA?a:b,CT:tA?b:a};done=false;
+  var H=hist(),half=Math.floor(players.length/2),names=players.map(function(p){return p.n}),best=null,bv=1e9,i;
+  for(i=0;i<500&&bv>0;i++){
+    var sh=shuffle(names),a=sh.slice(0,half),b=sh.slice(half);
+    [[a,b],[b,a]].forEach(function(o){
+      var v=viol(o[0],o[1],H)+(key(o[0],o[1])===last?1:0);
+      if(v<bv||(v===bv&&Math.random()<.5)){bv=v;best=o}
+    });
+  }
+  last=key(best[0],best[1]);
+  cur={T:best[0],CT:best[1]};done=false;
   show();
+  if(bv>0)$('info').textContent='Kuralların hepsi sağlanamadı, en uygun dağılım seçildi.';
 }
 function show(){
   timers.forEach(clearTimeout);timers=[];
@@ -145,16 +187,17 @@ function show(){
 function win(side){
   if(!cur||done)return;
   done=true;
-  rounds.push({w:cur[side].slice(),s:side});save();render();
+  rounds.push({n:rounds.length+1,w:cur[side].slice(),s:side,T:cur.T.slice(),CT:cur.CT.slice()});save();render();
   $('wT').disabled=true;$('wCT').disabled=true;
   $('info').textContent=(side==='T'?'Terörist':'Anti-Terör')+' takımının her oyuncusuna 3 puan yazıldı.';
 }
 $('wT').onclick=function(){win('T')};
 $('wCT').onclick=function(){win('CT')};
 $('draw').onclick=draw;
+$('games').onclick=function(e){var b=e.target.closest('button[data-g]');if(!b)return;var i=+b.getAttribute('data-g');sel=(sel===i)?-1:i;renderGames()};
 $('undo').onclick=function(){
   if(!rounds.length)return;
-  var r=rounds.pop();save();render();
+  var r=rounds.pop();if(sel>=rounds.length)sel=-1;save();render();
   if(cur&&done&&r.s){done=false;$('wT').disabled=false;$('wCT').disabled=false}
   $('billOut').innerHTML='';$('info').textContent='Son maç geri alındı.';
 };
@@ -162,7 +205,7 @@ $('reset').onclick=function(){
   var b=$('reset');
   if(!rt){b.textContent='Emin misin? Tekrar bas';rt=setTimeout(function(){b.textContent='Geceyi sıfırla';rt=null},3000);return}
   clearTimeout(rt);rt=null;b.textContent='Geceyi sıfırla';
-  rounds=[];save();render();$('billOut').innerHTML='';$('info').textContent='Puanlar sıfırlandı.';
+  rounds=[];sel=-1;last='';try{localStorage.removeItem('cs-rounds')}catch(e){}save();render();$('billOut').innerHTML='';$('info').textContent='Puanlar ve maç geçmişi sıfırlandı.';
 };
 $('pay').onclick=function(){
   var out=$('billOut');
