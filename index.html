@@ -3,102 +3,89 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Salı Akşamı Kurası</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Barlow:wght@400;600&display=swap">
+<meta name="theme-color" content="#2f3629">
+<title>COUNTER-STRIKE 1.6 — SALI OPERASYONU</title>
 <style>
-:root{--bg:#eceae5;--sf:#fff;--tx:#1d2124;--mu:#5d656b;--ln:#cfccc4;--t:#b7791f;--ct:#2b6cb0;--ac:#1d2124;--ac-tx:#fff;--bad:#b3261e;
-box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#16181a;--sf:#202427;--tx:#e8e6e1;--mu:#8b9298;--ln:#343a3e;--t:#e0a43a;--ct:#5b9bd5;--ac:#e8e6e1;--ac-tx:#16181a;--bad:#f2837b}}
-:root[data-theme="dark"]{--bg:#16181a;--sf:#202427;--tx:#e8e6e1;--mu:#8b9298;--ln:#343a3e;--t:#e0a43a;--ct:#5b9bd5;--ac:#e8e6e1;--ac-tx:#16181a;--bad:#f2837b}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
+:root{--bg:#4c5844;--sf:#3e4637;--tx:#eaede6;--mu:#c9d2c0;--ln:#282e22;--hi:#8c9284;--gold:#ddce63;--t:#ffae42;--ct:#7cc0ff;--bad:#ff6b6b;color-scheme:dark}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--tx);font:400 16px/1.5 Barlow,system-ui,sans-serif}
-main{max-width:920px;margin:0 auto;padding:28px 18px 48px}
-h1{font:800 clamp(34px,8vw,56px)/1 "Barlow Condensed",Impact,sans-serif;margin:0 0 6px}
-.sub{color:var(--mu);margin:0 0 26px}
+body{margin:0;background:#2f3629 radial-gradient(circle at top,#3f4937 0%,#22271e 100%);color:var(--tx);font:400 15px/1.45 Tahoma,Verdana,system-ui,sans-serif;min-height:100vh}
+main{max-width:920px;margin:0 auto;padding:calc(28px + env(safe-area-inset-top,0px)) 18px calc(48px + env(safe-area-inset-bottom,0px))}
+h1{color:var(--gold);font-size:clamp(22px,4.5vw,32px);font-weight:700;letter-spacing:.05em;text-transform:uppercase;text-shadow:2px 2px 0 #1c2018;margin:0 0 10px}
+.sub,.empty,.detail,.payers,ul,input{background:var(--sf);border:2px solid;border-color:var(--ln) var(--hi) var(--hi) var(--ln)}
+.sub{margin:0 0 22px;padding:9px 12px;font-size:14px}
 .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:18px}
-@media (max-width:720px){.grid{grid-template-columns:1fr}}
-.card{background:var(--sf);border:1px solid var(--ln);border-radius:6px;padding:16px}
+@media(max-width:720px){.grid{grid-template-columns:1fr}}
+.card,button{background:var(--bg);border:2px solid;border-color:var(--hi) var(--ln) var(--ln) var(--hi)}
+.card{padding:16px;box-shadow:4px 4px 0 rgba(0,0,0,.45)}
 .bill{margin-top:18px}
-h2{font:600 22px/1.1 "Barlow Condensed",sans-serif;margin:0 0 12px}
+h2{color:var(--gold);font:700 15px/1.2 Tahoma,Verdana,sans-serif;letter-spacing:.06em;text-transform:uppercase;margin:0 0 12px;padding-bottom:7px;border-bottom:1px solid var(--ln)}
 .add{display:flex;gap:8px}
-input[type=text],input[type=number]{font:inherit;padding:10px 12px;border:1px solid var(--ln);border-radius:4px;background:var(--bg);color:var(--tx)}
+input{font:inherit;padding:8px 10px;color:#fff;border-radius:0}
 input[type=text]{flex:1;min-width:0}
-input[type=number]{width:70px}
-button{font:600 16px Barlow,sans-serif;cursor:pointer;border:0;border-radius:4px;padding:10px 16px;background:var(--ac);color:var(--ac-tx)}
-button.ghost{background:transparent;color:var(--mu);border:1px solid var(--ln)}
+input[type=number]{width:70px;text-align:center;font-weight:700}
+input::placeholder{color:var(--mu)}
+button{font:700 14px/1.2 Tahoma,Verdana,sans-serif;cursor:pointer;padding:9px 14px;color:var(--tx);border-radius:0}
+button:hover:not(:disabled){color:var(--gold)}
+button:active:not(:disabled){border-color:var(--ln) var(--hi) var(--hi) var(--ln);transform:translate(1px,1px)}
+button.ghost{font-weight:400}
 button:disabled{opacity:.45;cursor:default}
-button:focus-visible,input:focus-visible{outline:3px solid var(--ct);outline-offset:2px}
+button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
 ul{list-style:none;margin:14px 0 0;padding:0}
-li{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--ln)}
-li .n{flex:1;overflow-wrap:anywhere}
-li .pt{font:800 22px "Barlow Condensed",sans-serif;min-width:34px;text-align:right}
-.x{padding:2px 9px;background:transparent;color:var(--mu);font-size:20px}
-.hint{color:var(--mu);font-size:14px;margin:10px 0 0}
-.count{color:var(--mu);font-weight:400;font-size:16px}
+li{display:flex;align-items:center;gap:10px;padding:7px 10px;border-bottom:1px solid var(--ln)}
+li:last-child{border-bottom:0}
+li .n{flex:1;overflow-wrap:anywhere;color:#fff;font-weight:600}
+li .pt{color:var(--gold);font-weight:700;font-size:17px;min-width:34px;text-align:right}
+.x{padding:2px 8px;background:transparent;color:var(--mu);font-size:18px;border:0}
+.hint,.count{color:var(--mu);font-size:13.5px;font-weight:400}
+.hint{margin:10px 0 0}
 .actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;align-items:center}
-.actions .go{flex:1;font:800 22px "Barlow Condensed",sans-serif;padding:12px;letter-spacing:.03em}
+.actions .go{flex:1;font-size:16px;padding:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold)}
 .teams{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.team{border-top:6px solid var(--c);background:var(--bg);border-radius:4px;padding:12px;min-height:180px}
+.team{border:2px solid;border-color:var(--c) var(--hi) var(--hi) var(--ln);border-top-width:4px;background:var(--sf);padding:12px;min-height:180px}
 .team.t{--c:var(--t)}.team.ct{--c:var(--ct)}
-.team h3{font:800 28px/1 "Barlow Condensed",sans-serif;margin:0 0 8px;color:var(--c)}
-.team div.p{font:600 20px/1.3 Barlow,sans-serif;padding:5px 0;border-top:1px solid var(--ln);animation:in .35s both}
-@keyframes in{from{opacity:0;transform:translateX(-10px)}}
-@media (prefers-reduced-motion:reduce){.team div.p{animation:none}}
-.empty{color:var(--mu);padding:30px 6px;text-align:center}
-.win{flex:1;color:#fff}
-.win.t{background:#9a6412}.win.ct{background:#245d99}
-.g{padding:6px 12px;margin:0 6px 6px 0}
-.g.on{background:var(--ac);color:var(--ac-tx);border-color:var(--ac)}
-.detail{border:1px solid var(--ln);border-radius:4px;padding:6px 12px;margin-top:6px;background:var(--bg)}
-.dl{margin:6px 0}.dl.t b{color:var(--t)}.dl.ct b{color:var(--ct)}
-.payers{margin:12px 0 0;font:600 22px/1.4 Barlow,sans-serif}
-.payers b{color:var(--bad);font-weight:800}
+.team h3{font-size:16px;margin:0 0 8px;padding-bottom:6px;border-bottom:1px solid var(--ln);color:var(--c);text-transform:uppercase}
+.team div.p{font:600 16px/1.3 Tahoma,Verdana,sans-serif;padding:6px 2px;border-bottom:1px solid rgba(0,0,0,.25);color:#fff;animation:in .3s both}
+@keyframes in{from{opacity:0;transform:translateX(-8px)}}
+@media(prefers-reduced-motion:reduce){.team div.p{animation:none}}
+.empty{color:var(--mu);padding:30px 6px;text-align:center;margin:0}
+.win{flex:1}.win.t{color:var(--t);background:#3a3224}.win.ct{color:var(--ct);background:#253545}
+.g{padding:6px 12px;margin:0 6px 6px 0}.g.on{color:var(--gold);border-color:var(--gold);background:var(--sf)}
+.detail,.payers{padding:9px 12px;margin-top:8px}.dl{margin:6px 0}.dl.t b{color:var(--t)}.dl.ct b{color:var(--ct)}.payers b{color:var(--bad)}
 </style>
 </head>
 <body>
 <main>
-<h1>Salı akşamı kurası</h1>
+<h1>COUNTER-STRIKE 1.6 — SALI OPERASYONU</h1>
 <p class="sub">İsimleri yaz, takımlar tek tuşla çıksın. Kazanan takıma 3 puan yaz, gece sonunda en az puanlılar hesabı ödesin.</p>
 <div class="grid">
   <section class="card">
     <h2>Puan durumu <span class="count" id="count"></span></h2>
-    <div class="add">
-      <input type="text" id="name" placeholder="İsim yaz, Enter’a bas" maxlength="24" autocomplete="off" aria-label="Oyuncu adı">
-      <button id="addBtn">Ekle</button>
-    </div>
+    <div class="add"><input type="text" id="name" placeholder="İsim yaz, Enter’a bas" maxlength="24" autocomplete="off" aria-label="Oyuncu adı"><button type="button" id="addBtn">Ekle</button></div>
     <ul id="list"></ul>
     <h2 style="margin-top:22px">Oynanan maçlar</h2>
-    <div id="games"></div>
-    <div id="detail"></div>
-    <div class="actions"><button class="ghost" id="clear">Listeyi temizle</button></div>
+    <div id="games"></div><div id="detail"></div>
+    <div class="actions"><button type="button" class="ghost" id="clear">Listeyi temizle</button></div>
   </section>
   <section class="card">
     <h2>Takımlar</h2>
     <div id="out"><p class="empty">En az 2 oyuncu ekle, sonra kurayı çek.</p></div>
-    <div class="actions" id="res" hidden>
-      <button class="win t" id="wT">Terörist kazandı +3</button>
-      <button class="win ct" id="wCT">Anti-Terör kazandı +3</button>
-    </div>
-    <div class="actions"><button class="go" id="draw">Kurayı çek</button></div>
+    <div class="actions" id="res" hidden><button type="button" class="win t" id="wT">Terörist kazandı +3</button><button type="button" class="win ct" id="wCT">Anti-Terör kazandı +3</button></div>
+    <div class="actions"><button type="button" class="go" id="draw">Kurayı çek</button></div>
     <p class="hint" id="info" role="status"></p>
   </section>
 </div>
 <section class="card bill">
   <h2>Hesap kimden? <span class="count" id="rc"></span></h2>
   <div class="actions" style="margin-top:0">
-    <label for="k">Ödeyecek kişi sayısı</label>
-    <input type="number" id="k" min="1" max="20" value="4">
-    <button id="pay">Hesabı kim ödüyor?</button>
-    <button class="ghost" id="undo">Son maçı geri al</button>
-    <button class="ghost" id="reset">Geceyi sıfırla</button>
+    <label for="k">Ödeyecek kişi sayısı</label><input type="number" id="k" min="1" max="20" value="4">
+    <button type="button" id="pay">Hesabı kim ödüyor?</button><button type="button" class="ghost" id="undo">Son maçı geri al</button><button type="button" class="ghost" id="reset">Geceyi sıfırla</button>
   </div>
   <div id="billOut" role="status"></div>
 </section>
 </main>
 <script>
 (function(){
-var players=[],rounds=[],last='',timers=[],cur=null,done=true,rt=null,sel=-1;
+var players=[],rounds=[],last='',timers=[],cur=null,done=true,rt=null,sel=-1,warn=0;
 var $=function(i){return document.getElementById(i)};
 try{var s=JSON.parse(localStorage.getItem('cs-players2')||'[]');if(Array.isArray(s))players=s.filter(function(p){return p&&typeof p.n==='string'}).slice(0,20).map(function(p){return{n:p.n}});
 var r=JSON.parse(localStorage.getItem('cs-rounds')||'[]');if(Array.isArray(r))rounds=r.filter(function(x){return x&&Array.isArray(x.w)})}catch(e){}
@@ -134,7 +121,7 @@ function add(){
 $('addBtn').onclick=add;
 $('name').onkeydown=function(e){if(e.key==='Enter')add()};
 $('list').onclick=function(e){var r=e.target.getAttribute('data-r');if(r!==null){players.splice(+r,1);save();render()}};
-$('clear').onclick=function(){players=[];rounds=[];sel=-1;last='';cur=null;save();render();$('res').hidden=true;$('billOut').innerHTML='';$('out').innerHTML='<p class="empty">En az 2 oyuncu ekle, sonra kurayı çek.</p>';$('info').textContent=''};
+$('clear').onclick=function(){players=[];rounds=[];sel=-1;last='';cur=null;done=true;warn=0;$('draw').textContent='Kurayı çek';save();render();$('res').hidden=true;$('billOut').innerHTML='';$('out').innerHTML='<p class="empty">En az 2 oyuncu ekle, sonra kurayı çek.</p>';$('info').textContent=''};
 function key(a,b){var f=function(x){return x.slice().sort().join('|')};var A=f(a),B=f(b);return A<B?A+'//'+B:B+'//'+A}
 function tk(a){return a.slice().sort().join('|')}
 function hist(){return rounds.filter(function(r){return Array.isArray(r.T)&&Array.isArray(r.CT)})}
@@ -170,6 +157,8 @@ function scoreMatch(T,CT,H){
 }
 function draw(){
   if(players.length<2){$('info').textContent='Kura için en az 2 oyuncu gerekli.';return}
+  if(cur&&!done){var now=Date.now();if(!warn||now-warn>6000){warn=now;$('info').textContent='Önceki maç için kazanan işaretlenmedi! Yine de yeni kura çekmek için bir kez daha bas.';return}if(now-warn<700)return}
+  warn=0;
   var H=hist(),half=Math.floor(players.length/2),names=players.map(function(p){return p.n}),best=null,bv=1e9,i;
   for(i=0;i<800;i++){
     var sh=shuffle(names),a=sh.slice(0,half),b=sh.slice(half);
