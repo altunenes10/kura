@@ -139,36 +139,48 @@ function key(a,b){var f=function(x){return x.slice().sort().join('|')};var A=f(a
 function tk(a){return a.slice().sort().join('|')}
 function hist(){return rounds.filter(function(r){return Array.isArray(r.T)&&Array.isArray(r.CT)})}
 function side(r,p){return r.T.indexOf(p)>-1?'T':r.CT.indexOf(p)>-1?'CT':''}
-function viol(T,CT,H){
-  var v=0,n=H.length;
-  if(n>=2){
-    var h1=H[n-1],h2=H[n-2];
-    T.forEach(function(p){if(side(h1,p)==='T'&&side(h2,p)==='T')v++});
-    CT.forEach(function(p){if(side(h1,p)==='CT'&&side(h2,p)==='CT')v++});
-    [h1.T,h1.CT].forEach(function(A){[h2.T,h2.CT].forEach(function(B){
-      var c=A.filter(function(p){return B.indexOf(p)>-1});
-      if(c.length>=3)[T,CT].forEach(function(tm){if(tm.filter(function(p){return c.indexOf(p)>-1}).length>=3)v++});
+function pk(a,b){return a<b?a+'|'+b:b+'|'+a}
+function scoreMatch(T,CT,H){
+  var pen=0,n=H.length,pc={},i,j;
+  H.forEach(function(r){[r.T,r.CT].forEach(function(tm){
+    for(i=0;i<tm.length;i++)for(j=i+1;j<tm.length;j++){var k=pk(tm[i],tm[j]);pc[k]=(pc[k]||0)+1}
+  })});
+  [T,CT].forEach(function(tm){
+    for(i=0;i<tm.length;i++)for(j=i+1;j<tm.length;j++){var c=pc[pk(tm[i],tm[j])]||0;pen+=c*c*4}
+  });
+  if(n>=1){
+    var L=H[n-1];
+    [L.T,L.CT].forEach(function(old){[T,CT].forEach(function(nw){
+      var c=nw.filter(function(p){return old.indexOf(p)>-1}).length;
+      if(c>=3)pen+=250*(c-2);
     })});
   }
-  var ks=[];H.slice(-3).forEach(function(r){ks.push(tk(r.T),tk(r.CT))});
-  if(ks.indexOf(tk(T))>-1)v++;
-  if(ks.indexOf(tk(CT))>-1)v++;
-  return v;
+  var tK=tk(T),cK=tk(CT);
+  H.forEach(function(r){
+    var a=tk(r.T),b=tk(r.CT);
+    if(a===tK||b===tK)pen+=500;
+    if(a===cK||b===cK)pen+=500;
+  });
+  [['T',T],['CT',CT]].forEach(function(x){x[1].forEach(function(p){
+    var mine=H.filter(function(r){return side(r,p)===x[0]}).length,other=H.filter(function(r){return side(r,p)&&side(r,p)!==x[0]}).length;
+    if(mine>other)pen+=(mine-other)*3;
+    if(n>=2&&side(H[n-1],p)===x[0]&&side(H[n-2],p)===x[0])pen+=400;
+  })});
+  return pen;
 }
 function draw(){
   if(players.length<2){$('info').textContent='Kura için en az 2 oyuncu gerekli.';return}
   var H=hist(),half=Math.floor(players.length/2),names=players.map(function(p){return p.n}),best=null,bv=1e9,i;
-  for(i=0;i<500&&bv>0;i++){
+  for(i=0;i<800;i++){
     var sh=shuffle(names),a=sh.slice(0,half),b=sh.slice(half);
     [[a,b],[b,a]].forEach(function(o){
-      var v=viol(o[0],o[1],H)+(key(o[0],o[1])===last?1:0);
+      var v=scoreMatch(o[0],o[1],H)+(key(o[0],o[1])===last?1000:0);
       if(v<bv||(v===bv&&Math.random()<.5)){bv=v;best=o}
     });
   }
   last=key(best[0],best[1]);
   cur={T:best[0],CT:best[1]};done=false;
   show();
-  if(bv>0)$('info').textContent='Kuralların hepsi sağlanamadı, en uygun dağılım seçildi.';
 }
 function show(){
   timers.forEach(clearTimeout);timers=[];
