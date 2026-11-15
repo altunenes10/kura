@@ -4,7 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#4a5942">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CS 1.6 Kura">
 <title>COUNTER-STRIKE 1.6 — SALI OPERASYONU</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23292c21'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%23c4b550' stroke-width='2.2'/%3E%3Cpath d='M16 3v7M16 22v7M3 16h7M22 16h7' stroke='%239ce06c' stroke-width='2.2'/%3E%3Ccircle cx='16' cy='16' r='2' fill='%23ffae42'/%3E%3C/svg%3E">
 <style>
 /* cs16.samke.me (cs16.css) VGUI Design System + Salı Operasyonu */
@@ -160,6 +167,8 @@ h2{
 }
 button.ghost{font-weight:400;color:var(--secondary-text)}
 .snd-btn{font-size:12px;padding:6px 10px}
+.title-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.inst-btn{font-size:12px;padding:6px 10px;color:var(--accent)}
 
 /* cs16.css Inputs */
 .cs-input,input{
@@ -327,7 +336,10 @@ li .pt{color:var(--accent);font-weight:700;font-size:16px;min-width:28px;text-al
       <h1>COUNTER-STRIKE 1.6 — SALI OPERASYONU</h1>
       <span class="map-badge" title="Sabit harita">MAP: <b>fy_snow</b></span>
     </div>
-    <button type="button" class="cs-btn ghost snd-btn" id="sndBtn" aria-pressed="true">SES: AÇIK</button>
+    <div class="title-actions">
+      <button type="button" class="cs-btn inst-btn" id="installBtn" hidden>Ana Ekrana Ekle</button>
+      <button type="button" class="cs-btn ghost snd-btn" id="sndBtn" aria-pressed="true">SES: AÇIK</button>
+    </div>
   </div>
   <hr class="cs-hr">
   <div class="hud-radio" id="radioLog" aria-live="polite"><span class="tag">[fy_snow]</span><span>Sunucu hazır.</span></div>
@@ -928,6 +940,33 @@ function fallbackCopy(text){
   try{document.execCommand('copy');flashShare('Panoya kopyalandı!');logRadio('[RADIO]','Puan durumu panoya kopyalandı.')}
   catch(e){flashShare('Kopyalama başarısız.')}
   document.body.removeChild(ta);
+}
+
+/* PWA Kurulum & Çevrimdışı Desteği */
+var deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',function(e){
+  e.preventDefault();
+  deferredPrompt=e;
+  $('installBtn').hidden=false;
+});
+$('installBtn').onclick=function(){
+  if(!deferredPrompt)return;
+  sfx('click');
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(function(){
+    deferredPrompt=null;
+    $('installBtn').hidden=true;
+  });
+};
+window.addEventListener('appinstalled',function(){
+  deferredPrompt=null;
+  $('installBtn').hidden=true;
+  logRadio('[SYSTEM]','Uygulama ana ekrana eklendi.');
+});
+if('serviceWorker' in navigator&&location.protocol.indexOf('http')===0){
+  window.addEventListener('load',function(){
+    navigator.serviceWorker.register('./sw.js').catch(function(){});
+  });
 }
 
 render();
